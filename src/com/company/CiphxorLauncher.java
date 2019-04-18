@@ -1,29 +1,24 @@
 package com.company;
 
 import com.company.Ciphxor;
-import org.kohsuke.args4j.Argument;
-        import org.kohsuke.args4j.CmdLineException;
-        import org.kohsuke.args4j.CmdLineParser;
-        import org.kohsuke.args4j.Option;
-
-        import java.io.IOException;
+import org.kohsuke.args4j.*;
+import java.io.IOException;
 
 public class CiphxorLauncher {
 
-    @Option(name = "-c", metaVar = "Encryption", usage = "Input file encryption key")
-    private int inputEncryption = 0;                                            //даже если незадано,ничего не изменится
+    @Option(name = "-c", metaVar = "inputEncryption", usage = "Input file encryption key")
+    private String inputEncryption = "0";                                            //если не задано,ничего не изменится
 
-    @Option(name = "-d", metaVar = "Decryption", usage = "Input file decryption key")
-    private int inputDecryption = 0;                                                                        //аналогично
+    @Option(name = "-d", metaVar = "inputDecryption", usage = "Input file decryption key")
+    private String inputDecryption = "0";                                                                        //аналогично
 
-    @Argument(required = true, metaVar = "InputName", usage = "Input file name")
+    @Argument(required = true, usage = "input file name")
     private String inputFileName;
 
-    @Argument(metaVar = "OutputName", index = 1, usage = "Output file name")
+    @Option(name = "-o", usage = "output file name")
     private String outputFileName;
 
     public static void main(String[] args) {
-
         new CiphxorLauncher().launch(args);
     }
 
@@ -31,16 +26,18 @@ public class CiphxorLauncher {
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
+            if(outputFileName == null)
+                outputFileName = inputFileName + ".txt";
         } catch (CmdLineException e) {
             System.err.println(e.getMessage());
-            System.err.println("java -jar Сiphxor.jar [-c Encryption] [-d Decryption] InputName [OutputName]");
+            System.err.println("java -jar Сiphxor.jar [-c Encryption] [-d Decryption] InputName [-o OutputName]");
             parser.printUsage(System.err);
             return;
         }
 
-            Ciphxor ciphxor = new Ciphxor(inputFileName, outputFileName, inputEncryption, inputDecryption);
+            Ciphxor ciphxor = new Ciphxor();
             try {
-                ciphxor.recode();
+                Ciphxor.recode(inputEncryption, inputDecryption, inputFileName, outputFileName);
                 System.out.println("Done");
             } catch (IOException e) {
                 System.err.println(e.getMessage());
