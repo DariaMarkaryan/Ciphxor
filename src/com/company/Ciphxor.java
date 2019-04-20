@@ -2,13 +2,15 @@ package com.company;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 @SuppressWarnings("WeakerAccess")
  class Ciphxor {
-    private static void recode(FileInputStream inputStream, String outputFileName, String encodeTo, String encodeFrom) throws IOException {
+    private static void recode(FileInputStream inputStream, String outputFileName, String encodeTo, String encodeFrom)
+            throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         File outFile = new File(outputFileName);
-        FileWriter fw = new FileWriter(outFile, true);
+        FileWriter fw = new FileWriter(outFile, false);
         int ien = Integer.parseInt(encodeTo,16);
         int ide = Integer.parseInt(encodeFrom,16);
         String strLine;
@@ -44,10 +46,16 @@ import java.nio.ByteBuffer;
         else if(key >= Math.pow(2, 8) && key < Math.pow(2, 16)) numOfBytes = 2;
         else if(key >= Math.pow(2, 16) && key < Math.pow(2, 24)) numOfBytes = 3;
         else numOfBytes = 4;
-       return ByteBuffer.allocate(numOfBytes).putInt(key).array();
+        ByteBuffer bos = ByteBuffer.allocate(4);
+        bos.putInt(key);
+        byte[] res = new byte[numOfBytes];
+        byte[] temp = bos.array();
+        System.arraycopy(temp, temp.length - res.length, res, 0, res.length);
+        return res;
     }
 
-    public static void recode(String encodeTo, String encodeFrom, String inputFileName, String outputFileName) throws IOException {
+    public static void recode(String encodeTo, String encodeFrom, String inputFileName, String outputFileName)
+            throws IOException {
         try (FileInputStream inputStream = new FileInputStream(inputFileName)) {
             Ciphxor.recode(inputStream, outputFileName, encodeTo, encodeFrom);
         }

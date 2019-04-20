@@ -26,6 +26,7 @@ public class CiphxorLauncher {
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
+            int ien = Integer.parseInt(inputEncryption,16);
             if(outputFileName == null)
                 outputFileName = inputFileName + ".txt";
         } catch (CmdLineException e) {
