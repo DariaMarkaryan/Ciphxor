@@ -6,26 +6,44 @@ import java.util.ArrayList;
 
 @SuppressWarnings("WeakerAccess")
  class Ciphxor {
-    private static void recode(FileInputStream inputStream, String outputFileName, String encodeTo, String encodeFrom)
+    private static void recode(FileInputStream inputStream, String outputFileName, String key) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        File outFile = new File(outputFileName);
+        FileWriter fw = new FileWriter(outFile, false);
+        int ien = Integer.parseInt(key,16);
+        String strLine;
+
+        while ((strLine = br.readLine()) != null) {
+            byte[] txt = strLine.getBytes();
+            byte[] ekey = hexToBytes(ien);
+            byte[] res = new byte[0];
+           if(ien != 0)
+               res = xor(txt, ekey, strLine.length());
+            fw.append(new String(res));
+           fw.write("\r\n");
+        }
+        fw.flush();
+        fw.close();
+        br.close();
+    }
+
+    private static void recode(FileInputStream inputStream, String outputFileName, String keyEnc, String keyDec)
             throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
         File outFile = new File(outputFileName);
         FileWriter fw = new FileWriter(outFile, false);
-        int ien = Integer.parseInt(encodeTo,16);
-        int ide = Integer.parseInt(encodeFrom,16);
+        int ien = Integer.parseInt(keyEnc,16);
+        int ide = Integer.parseInt(keyDec,16);
         String strLine;
 
         while ((strLine = br.readLine()) != null) {
             byte[] txt = strLine.getBytes();
             byte[] ekey = hexToBytes(ien);
             byte[] dkey = hexToBytes(ide);
-            byte[] res = new byte[0];
-           if(ien != 0)
-               res = xor(txt, ekey, strLine.length());
-            if(ide != 0)
-                res = xor(res, dkey, strLine.length());
+            byte[] res = xor(txt, ekey, strLine.length());
+            res = xor(res, dkey,strLine.length());
             fw.append(new String(res));
-           fw.write("\r\n");
+            fw.write("\r\n");
         }
         fw.flush();
         fw.close();
@@ -54,10 +72,17 @@ import java.util.ArrayList;
         return res;
     }
 
-    public static void recode(String encodeTo, String encodeFrom, String inputFileName, String outputFileName)
+    public static void recode(String inputFileName, String outputFileName, String key)
             throws IOException {
         try (FileInputStream inputStream = new FileInputStream(inputFileName)) {
-            Ciphxor.recode(inputStream, outputFileName, encodeTo, encodeFrom);
+            Ciphxor.recode(inputStream, outputFileName, key);
         }
     }
+    public static void recode(String inputFileName, String outputFileName, String keyFirst, String keySec)
+            throws IOException {
+        try (FileInputStream inputStream = new FileInputStream(inputFileName)) {
+            Ciphxor.recode(inputStream, outputFileName, keyFirst, keySec);
+        }
+    }
+
 }
