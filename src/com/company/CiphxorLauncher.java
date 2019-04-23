@@ -35,7 +35,6 @@ public class CiphxorLauncher {
             parser.printUsage(System.err);
             return;
         }
-            Ciphxor ciphxor = new Ciphxor();
             try {
                 Ciphxor.recode(inputFileName,outputFileName,inputEncryption,inputDecryption);
                 System.out.println("Done");

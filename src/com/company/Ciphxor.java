@@ -6,7 +6,6 @@ import java.nio.ByteBuffer;
 @SuppressWarnings("WeakerAccess")
 
  class Ciphxor {
-
     private static byte[] keyToByteArray(String key) {
         String temp;
         byte[] res = new byte[(int)Math.ceil((float)key.length()/2)];
@@ -36,12 +35,9 @@ import java.nio.ByteBuffer;
         String decryptedText = "";
         int keyItr = 0;
         for (int j = 0; j < hexToPairsArr.length; j++) {
-            byte temp =(byte)((byte)hexToPairsArr[j] ^ key[keyItr]);
+            byte temp =(byte)((byte)hexToPairsArr[j] ^ key[keyItr % key.length]);
             decryptedText += (char)temp;
             keyItr++;
-            if (keyItr >= key.length) {
-                keyItr = 0;
-            }
         }
         return decryptedText;
     }
@@ -51,11 +47,9 @@ import java.nio.ByteBuffer;
         String res = "";
 
         for (int j = 0; j < msg.length(); j++) {
-            int temp = msg.charAt(j) ^ key[Itr];
+            int temp = msg.charAt(j) ^ key[Itr % key.length];
             res += String.format("%02x", (byte) temp);
             Itr++;
-                if (Itr >= key.length)
-                    Itr = 0;
         }
     return res;
     }
@@ -68,22 +62,27 @@ import java.nio.ByteBuffer;
         String encrypHexa = "";
         byte[] ekeyarr = keyToByteArray(ekey);
         byte[] dkeyarr = keyToByteArray(dkey);
-        String msg;
         String rawMsg = "";
 
-    while((rawMsg = br.readLine()) != null){
         if (ekey != "") {
-            encrypHexa = encryption(rawMsg,ekeyarr);
-            if (dkey != "") encrypHexa = decryption(encrypHexa,dkeyarr);
-
+            while((rawMsg = br.readLine()) != null){
+                encrypHexa = encryption(rawMsg,ekeyarr);
+                if (dkey != "") encrypHexa = decryption(encrypHexa,dkeyarr);
+                fw.append(encrypHexa);
+                fw.write("\r\n");
+            }
         } else if (dkey != "") {
-            encrypHexa = decryption(rawMsg,dkeyarr);
+            while((rawMsg = br.readLine()) != null) {
+                encrypHexa = decryption(rawMsg, dkeyarr);
+                fw.append(encrypHexa);
+                fw.write("\r\n");
+            }
         } else {
-            encrypHexa = rawMsg;
+            while((rawMsg = br.readLine()) != null){
+                fw.append(rawMsg);
+                fw.write("\r\n");
+            }
         }
-        fw.append(encrypHexa);
-        fw.write("\r\n");
-    }
         fw.flush();
         fw.close();
         br.close();
