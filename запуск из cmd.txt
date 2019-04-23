@@ -1,2 +1,1 @@
-java -jar C:\Users\Дарья\IdeaProjects\consoleApp\consoleApp.jar -c 0x1 Test.txt Tested.txt
-java -jar C:\Users\Дарья\IdeaProjects\consoleApp\out\artifacts\consoleApp_jar\consoleApp.jar -c 0x1 Test.txt Tested.txt
+java -jar C:\Users\Дарья\IdeaProjects\consoleApp\out\artifacts\consoleApp_jar\consoleApp.jar -c 1 Test.txt Tested.txt

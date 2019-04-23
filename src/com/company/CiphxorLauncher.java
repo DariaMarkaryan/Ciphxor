@@ -2,17 +2,16 @@ package com.company;
 
 import com.company.Ciphxor;
 import org.kohsuke.args4j.*;
-
 import java.io.*;
-import java.nio.file.Files;
+
 
 public class CiphxorLauncher {
 
     @Option(name = "-c", metaVar = "inputEncryption", usage = "Input file encryption key")
-    private String inputEncryption = "";                                           //если не задано,ничего не изменится
+    private String inputEncryption = "";
 
     @Option(name = "-d", metaVar = "inputDecryption", usage = "Input file decryption key")
-    private String inputDecryption = "";                                                                   //аналогично
+    private String inputDecryption = "";
 
     @Argument(required = true, usage = "input file name")
     private String inputFileName;
@@ -28,7 +27,6 @@ public class CiphxorLauncher {
         CmdLineParser parser = new CmdLineParser(this);
         try {
             parser.parseArgument(args);
-            int ien = Integer.parseInt(inputEncryption,16);
             if(outputFileName == null)
                 outputFileName = inputFileName + ".txt";
         } catch (CmdLineException e) {
@@ -37,22 +35,9 @@ public class CiphxorLauncher {
             parser.printUsage(System.err);
             return;
         }
-
             Ciphxor ciphxor = new Ciphxor();
             try {
-                if(inputEncryption.equals("") && inputDecryption.equals("")){
-                    Ciphxor.recode(inputFileName,outputFileName,"0"); //как правильнее скпировать файлы?
-                }
-
-                if(!inputEncryption.equals("") && inputDecryption.equals(""))
-                    Ciphxor.recode(inputFileName,outputFileName,inputEncryption);
-
-                if(!inputDecryption.equals("") && inputEncryption.equals(""))
-                    Ciphxor.recode(inputFileName,outputFileName,inputDecryption);
-
-                if(!inputDecryption.equals("") && !inputEncryption.equals(""))
-                    Ciphxor.recode(inputFileName,outputFileName,inputEncryption, inputDecryption);
-
+                Ciphxor.recode(inputFileName,outputFileName,inputEncryption,inputDecryption);
                 System.out.println("Done");
             } catch (IOException e) {
                 System.err.println(e.getMessage());

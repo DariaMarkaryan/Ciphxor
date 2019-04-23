@@ -2,87 +2,97 @@ package com.company;
 
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 @SuppressWarnings("WeakerAccess")
+
  class Ciphxor {
-    private static void recode(FileInputStream inputStream, String outputFileName, String key) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        File outFile = new File(outputFileName);
-        FileWriter fw = new FileWriter(outFile, false);
-        int ien = Integer.parseInt(key,16);
-        String strLine;
 
-        while ((strLine = br.readLine()) != null) {
-            byte[] txt = strLine.getBytes();
-            byte[] ekey = hexToBytes(ien);
-            byte[] res = new byte[0];
-           if(ien != 0)
-               res = xor(txt, ekey, strLine.length());
-            fw.append(new String(res));
-           fw.write("\r\n");
-        }
-        fw.flush();
-        fw.close();
-        br.close();
-    }
-
-    private static void recode(FileInputStream inputStream, String outputFileName, String keyEnc, String keyDec)
-            throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-        File outFile = new File(outputFileName);
-        FileWriter fw = new FileWriter(outFile, false);
-        int ien = Integer.parseInt(keyEnc,16);
-        int ide = Integer.parseInt(keyDec,16);
-        String strLine;
-
-        while ((strLine = br.readLine()) != null) {
-            byte[] txt = strLine.getBytes();
-            byte[] ekey = hexToBytes(ien);
-            byte[] dkey = hexToBytes(ide);
-            byte[] res = xor(txt, ekey, strLine.length());
-            res = xor(res, dkey,strLine.length());
-            fw.append(new String(res));
-            fw.write("\r\n");
-        }
-        fw.flush();
-        fw.close();
-        br.close();
-    }
-
-    private static byte[] xor(byte[] txt, byte[]key, int len){
-        byte[] res = new byte[len];
-        for (int i = 0; i < len; i++){
-            res[i]= (byte)(txt[i]^key[i%key.length]);
+    private static byte[] keyToByteArray(String key) {
+        String temp;
+        byte[] res = new byte[(int)Math.ceil((float)key.length()/2)];
+        int pos = res.length - 1;
+        for(int i = key.length() - 1; i >= 0; i -= 2){
+            if(i == 0 )
+                temp = Character.toString(key.charAt(0));
+            else{
+                temp = key.substring(i - 1, i + 1);
+            }
+            res[pos] = (byte)Integer.parseInt(temp, 16);
+            pos--;
         }
         return res;
     }
 
-    private static byte[] hexToBytes(int key){
-        int numOfBytes;
-        if(key < Math.pow(2, 8)) numOfBytes = 1;
-        else if(key >= Math.pow(2, 8) && key < Math.pow(2, 16)) numOfBytes = 2;
-        else if(key >= Math.pow(2, 16) && key < Math.pow(2, 24)) numOfBytes = 3;
-        else numOfBytes = 4;
-        ByteBuffer bos = ByteBuffer.allocate(4);
-        bos.putInt(key);
-        byte[] res = new byte[numOfBytes];
-        byte[] temp = bos.array();
-        System.arraycopy(temp, temp.length - res.length, res, 0, res.length);
-        return res;
+    private static String decryption(String msg, byte[] key ) {
+        String hexToPairs = "";
+        int i = 0;
+        while (i < msg.length() - 1) {
+            String output = msg.substring(i, i + 2);
+            int decimal = Integer.parseInt(output, 16);
+            hexToPairs += (char)decimal;
+            i += 2;
+        }
+        char[] hexToPairsArr = hexToPairs.toCharArray();
+        String decryptedText = "";
+        int keyItr = 0;
+        for (int j = 0; j < hexToPairsArr.length; j++) {
+            byte temp =(byte)((byte)hexToPairsArr[j] ^ key[keyItr]);
+            decryptedText += (char)temp;
+            keyItr++;
+            if (keyItr >= key.length) {
+                keyItr = 0;
+            }
+        }
+        return decryptedText;
     }
 
-    public static void recode(String inputFileName, String outputFileName, String key)
-            throws IOException {
-        try (FileInputStream inputStream = new FileInputStream(inputFileName)) {
-            Ciphxor.recode(inputStream, outputFileName, key);
+    private static String encryption(String msg, byte[] key){
+        int Itr = 0;
+        String res = "";
+
+        for (int j = 0; j < msg.length(); j++) {
+            int temp = msg.charAt(j) ^ key[Itr];
+            res += String.format("%02x", (byte) temp);
+            Itr++;
+                if (Itr >= key.length)
+                    Itr = 0;
         }
-    }
-    public static void recode(String inputFileName, String outputFileName, String keyFirst, String keySec)
-            throws IOException {
-        try (FileInputStream inputStream = new FileInputStream(inputFileName)) {
-            Ciphxor.recode(inputStream, outputFileName, keyFirst, keySec);
-        }
+    return res;
     }
 
+    private static void recode(FileInputStream inputStream, String outputFileName, String ekey, String dkey)
+            throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        File outFile = new File(outputFileName);
+        FileWriter fw = new FileWriter(outFile, false);
+        String encrypHexa = "";
+        byte[] ekeyarr = keyToByteArray(ekey);
+        byte[] dkeyarr = keyToByteArray(dkey);
+        String msg;
+        String rawMsg = "";
+
+    while((rawMsg = br.readLine()) != null){
+        if (ekey != "") {
+            encrypHexa = encryption(rawMsg,ekeyarr);
+            if (dkey != "") encrypHexa = decryption(encrypHexa,dkeyarr);
+
+        } else if (dkey != "") {
+            encrypHexa = decryption(rawMsg,dkeyarr);
+        } else {
+            encrypHexa = rawMsg;
+        }
+        fw.append(encrypHexa);
+        fw.write("\r\n");
+    }
+        fw.flush();
+        fw.close();
+        br.close();
+}
+
+    public static void recode(String inputFileName, String outputFileName, String ekey, String dkey)
+            throws IOException {
+        try (FileInputStream inputStream = new FileInputStream(inputFileName)) {
+            Ciphxor.recode(inputStream, outputFileName, ekey, dkey);
+        }
+    }
 }
