@@ -1,1 +1,1 @@
-java -jar C:\Users\Дарья\IdeaProjects\consoleApp\out\artifacts\consoleApp_jar\consoleApp.jar -c 1 Test.txt -o youth.txt
+java -jar C:\Users\Дарья\IdeaProjects\consoleApp\out\artifacts\consoleApp_jar\consoleApp.jar -c 1F Test.txt -o youth.txt

@@ -40,13 +40,14 @@ class CiphxorLauncherTest {
         Ciphxor.recode("Text5.txt","Test5.txt.txt", "", "3F");
         byte[] res = Files.readAllBytes(Paths.get("Test.txt"));
         byte[] exp = Files.readAllBytes(Paths.get("Youth.txt.txt"));
+
         assertNotEquals(exp, res);
     }
 
     @Test
     void withoutAnyKeys() throws IOException {
         IOException e = assertThrows(IOException.class, () ->
-                Ciphxor.recode("Text3.txt","Text3.txt.txt", "", ""));
+                 Ciphxor.recode("Text3.txt","Text3.txt.txt", "", ""));
         assertEquals(e.getMessage(),"нет ключа");
     }
 
